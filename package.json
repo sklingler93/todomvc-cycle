@@ -25,6 +25,7 @@
     "@cycle/storage": "3.0.0-rc2",
     "@cycle/xstream-run": "3.0.0",
     "history": "^3.0.0",
+    "snabbdom-typestyle": "^1.0.7",
     "todomvc-app-css": "2.0.3",
     "todomvc-common": "1.0.1",
     "xstream": "^5.0.5"

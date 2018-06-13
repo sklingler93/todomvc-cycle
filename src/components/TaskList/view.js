@@ -1,6 +1,8 @@
 import {a, button, div, footer, h1, header, input, li,
         section, span, strong, ul} from '@cycle/dom';
 
+import {todoListStyle, footerStyle} from './styles';
+
 function renderHeader() {
   return header('.header', [
     h1('todos'),
@@ -28,7 +30,7 @@ function renderMainSection(todosData) {
     input('.toggle-all', {
       props: {type: 'checkbox', checked: allCompleted},
     }),
-    ul('.todo-list', todosData.list
+    ul('.todo-list', {css: todoListStyle()}, todosData.list
       .filter(todosData.filterFn)
       .map(data => data.todoItem.DOM)
     )
@@ -49,9 +51,8 @@ function renderFooter(todosData) {
     .filter(todoData => todoData.completed)
     .length;
   let amountActive = todosData.list.length - amountCompleted;
-  let footerStyle = {'display': todosData.list.length ? '' : 'none'};
 
-  return footer('.footer', {style: footerStyle}, [
+  return footer('.footer', {css: footerStyle(todosData.list.length)}, [
     span('.todo-count', [
       strong(String(amountActive)),
       ' item' + (amountActive !== 1 ? 's' : '') + ' left'
@@ -65,7 +66,7 @@ function renderFooter(todosData) {
       button('.clear-completed', 'Clear completed (' + amountCompleted + ')')
       : null
     )
-  ])
+  ]);
 }
 
 // THE VIEW
