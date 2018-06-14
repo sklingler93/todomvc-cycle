@@ -5,11 +5,20 @@ import model from './model';
 import view from './view';
 import {List} from './List';
 
-export const listLens = {
-  get: (state) => {
-    return state.list.filter(state.filterFn);
-  },
+function omit(obj, key) {
+  let tmp = { ...obj };
+  delete tmp[key];
+  return tmp;
+}
 
+export const listLens = {
+  get: (state) => state.list
+      .filter(state.filterFn)
+      .slice(0, -1)
+      .concat({
+          ...state.list[state.list.length - 1],
+          last: true
+      }),
   set: (state, nextFilteredList) => {
     const prevFilteredList = state.list.filter(state.filterFn);
     const newList = state.list
@@ -18,9 +27,12 @@ export const listLens = {
         prevFilteredList.some(t => t.key === task.key) &&
         nextFilteredList.some(t => t.key === task.key)
       );
+
     return {
       ...state,
-      list: newList,
+      list: newList
+        .slice(0, -1)
+        .concat(omit(newList[newList.length - 1], 'last'))
     };
   }
 }

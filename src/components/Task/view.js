@@ -1,9 +1,9 @@
 import {button, div, input, label, li} from '@cycle/dom';
-import {todoLiStyle, todoInputStyle} from './styles';
+import {todoLiStyle, todoInputStyle, viewStyle} from './styles';
 
 export default function view(state$) {
-  return state$.map(({title, completed, editing}) =>
-    li('.todoRoot', {css: todoLiStyle(editing), class: {completed, editing}}, [
+  return state$.map(({title, completed, editing, last}) =>
+    li('.todoRoot', {css: todoLiStyle(editing, last), class: {completed, editing}}, [
       div('.view', [
         input('.toggle', {
           props: {type: 'checkbox', checked: completed},

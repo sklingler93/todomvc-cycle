@@ -1,12 +1,19 @@
-export const todoLiStyle = (editing) => ({
+export const viewStyle = (editing) => ({
+  'display': editing ? 'none' : 'block',
+});
+
+export const todoLiStyle = (editing, last) => ({
   'position'  : 'relative',
   'font-size' : '24px',
   ...(editing ? {
     'border-bottom': 'none',
-    'padding'      : '0'
+    'padding'      : '0',
   } : {
     'border-bottom': '1px solid #ededed',
-  })
+  }),
+  ...(last ? {                            // Instead of using a :last-child selector,
+    'border-bottom': 'none',              // the element selects the style
+  } : {}),
 });
 
 export const fontSmoothingStyle = () => ({
