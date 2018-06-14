@@ -3,7 +3,7 @@ import {todoLiStyle, todoInputStyle} from './styles';
 
 export default function view(state$) {
   return state$.map(({title, completed, editing}) =>
-    return li('.todoRoot', {css: todoLiStyle(editing), class: {completed, editing}}, [
+    li('.todoRoot', {css: todoLiStyle(editing), class: {completed, editing}}, [
       div('.view', [
         input('.toggle', {
           props: {type: 'checkbox', checked: completed},

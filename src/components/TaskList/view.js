@@ -46,7 +46,7 @@ function renderFooter(state) {
     .length;
   const amountActive = state.list.length - amountCompleted;
 
-  return footer('.footer', {css: footerStyle(todosData.list.length)}, [
+  return footer('.footer', {css: footerStyle(state.list.length)}, [
     span('.todo-count', [
       strong(String(amountActive)),
       ' item' + (amountActive !== 1 ? 's' : '') + ' left'
