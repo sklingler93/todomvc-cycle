@@ -2,6 +2,7 @@ import xs from 'xstream';
 import {
   a, button, div, footer, h1, header, input, li, section, span, strong, ul
 } from '@cycle/dom';
+import {todoListStyle, footerStyle} from './styles';
 
 function renderHeader(state) {
   return header('.header', [
@@ -44,9 +45,8 @@ function renderFooter(state) {
     .filter(task => task.completed)
     .length;
   const amountActive = state.list.length - amountCompleted;
-  const footerStyle = {'display': state.list.length ? '' : 'none'};
 
-  return footer('.footer', {style: footerStyle}, [
+  return footer('.footer', {css: footerStyle(todosData.list.length)}, [
     span('.todo-count', [
       strong(String(amountActive)),
       ' item' + (amountActive !== 1 ? 's' : '') + ' left'
@@ -60,7 +60,7 @@ function renderFooter(state) {
       button('.clear-completed', 'Clear completed (' + amountCompleted + ')')
       : null
     )
-  ])
+  ]);
 }
 
 export default function view(state$, listVDom$) {

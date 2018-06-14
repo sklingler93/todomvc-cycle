@@ -25,6 +25,7 @@
     "@cycle/storage": "4.1.1",
     "cycle-onionify": "4.0.0-rc.17",
     "cycle-storageify": "3.2",
+    "snabbdom-typestyle": "^1.0.7",
     "todomvc-app-css": "2.1.x",
     "todomvc-common": "1.0.3",
     "xstream": "10.9"
