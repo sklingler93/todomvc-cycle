@@ -1,12 +1,13 @@
 import xs from 'xstream';
 import {
-  a, button, div, footer, h1, header, input, li, section, span, strong, ul
+  a, button, div, footer, h1, header, input, li, section, span, strong, ul, label
 } from '@cycle/dom';
-import {todoListStyle, footerStyle} from './styles';
+import * as globalStyles from '../../styles';
+import * as styles from './styles';
 
 function renderHeader(state) {
-  return header('.header', [
-    h1('todos'),
+  return header([
+    h1({ css: styles.title() }, 'todos'),
     input('.new-todo', {
       props: {
         type: 'text',
@@ -14,28 +15,34 @@ function renderHeader(state) {
         autofocus: true,
         name: 'newTodo',
         value: state.inputValue
-      }
+      },
+      css: styles.input(),
     })
   ]);
 }
 
 function renderMainSection(state, listVDom) {
   const allCompleted = state.list.reduce((x, y) => x && y.completed, true);
-  const sectionStyle = {'display': state.list.length ? '' : 'none'};
 
-  return section('.main', {style: sectionStyle}, [
-    input('.toggle-all', {
-      props: {type: 'checkbox', checked: allCompleted},
+  return section('.main', { css: styles.main(state.list.length) }, [
+    input('#toggle-all.toggle-all', {
+      props: { type: 'checkbox', checked: allCompleted },
+      css: styles.toggleAll(),
     }),
+    label('.label', {
+      attrs: { for: 'toggle-all' },
+      css: styles.toggleAllLabel(allCompleted),
+    }, 'Mark all as complete'),
     listVDom
   ]);
 }
 
 function renderFilterButton(state, filterTag, path, label) {
-  return li([
+  const selected = state.filter === filterTag;
+  return li({ css: styles.filtersLi() }, [
     a({
-      attrs: {href: path},
-      class: {selected: state.filter === filterTag}
+      attrs: { href: path },
+      css: styles.filtersA(selected)
     }, label)
   ]);
 }
@@ -46,18 +53,18 @@ function renderFooter(state) {
     .length;
   const amountActive = state.list.length - amountCompleted;
 
-  return footer('.footer', {css: footerStyle(state.list.length)}, [
-    span('.todo-count', [
-      strong(String(amountActive)),
+  return footer('.footer', { css: styles.footer(state.list.length) }, [
+    span('.todo-count', { css: styles.todoCount() }, [
+      strong({ css: globalStyles.strong() }, String(amountActive)),
       ' item' + (amountActive !== 1 ? 's' : '') + ' left'
     ]),
-    ul('.filters', [
+    ul('.filters', { css: styles.filters() }, [
       renderFilterButton(state, '', '/', 'All'),
       renderFilterButton(state, 'active', '/active', 'Active'),
       renderFilterButton(state, 'completed', '/completed', 'Completed'),
     ]),
     (amountCompleted > 0 ?
-      button('.clear-completed', 'Clear completed (' + amountCompleted + ')')
+      button('.clear-completed', { css: styles.clearCompleted() }, 'Clear completed (' + amountCompleted + ')')
       : null
     )
   ]);

@@ -26,11 +26,23 @@ export default function model(actions) {
       return void 0;
     });
 
+  const hoverReducer$ = actions.hover$
+    .mapTo(function hoverReducer(data) {
+      return {...data, hover: true};
+    });
+
+  const unhoverReducer$ = actions.unhover$
+    .mapTo(function unhoverReducer(data) {
+      return {...data, hover: false};
+    });
+
   return xs.merge(
     startEditReducer$,
     doneEditReducer$,
     cancelEditReducer$,
     toggleReducer$,
-    destroyReducer$
+    destroyReducer$,
+    hoverReducer$,
+    unhoverReducer$,
   );
 }

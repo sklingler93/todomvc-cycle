@@ -1,20 +1,20 @@
 import {button, div, input, label, li} from '@cycle/dom';
-import {todoLiStyle, todoInputStyle, viewStyle} from './styles';
+import * as styles from './styles';
 
 export default function view(state$) {
-  return state$.map(({title, completed, editing, last}) =>
-    li('.todoRoot', {css: todoLiStyle(editing, last), class: {completed, editing}}, [
-      div('.view', [
+  return state$.map(({ title, completed, editing, hover, last }) =>
+    li('.todo-root', { css: styles.todoLi(editing, last), class: {completed, editing} }, [
+      div('.view', { css: styles.view(editing) }, [
         input('.toggle', {
-          props: {type: 'checkbox', checked: completed},
-          style: {color: 'red'}
+          props: { type: 'checkbox', checked: completed },
+          css: styles.toggle()
         }),
-        label(title),
-        button('.destroy')
+        label({ css: styles.label(completed) }, title),
+        button('.destroy', { css: styles.destroy(hover) })
       ]),
       input('.edit', {
-        css: todoInputStyle(editing),
-        props: {type: 'text'},
+        css: styles.todoInput(editing),
+        props: { type: 'text' },
         hook: {
           update: (oldVNode, {elm}) => {
             elm.value = title;

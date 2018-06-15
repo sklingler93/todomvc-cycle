@@ -54,6 +54,8 @@ export default function model(actions) {
         title: content,
         completed: false,
         editing: false,
+        hover: false,
+        last: false,
       };
       return {
         ...prevState,

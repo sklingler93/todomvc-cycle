@@ -28,5 +28,14 @@ export default function intent(domSource) {
     destroy$: domSource
       .select('.destroy').events('click')
       .mapTo(null),
+
+    hover$: domSource
+      .select('.todo-root').events('mouseover')
+      .mapTo(null),
+
+    unhover$: domSource
+      .select('.todo-root').events('mouseleave')
+      .mapTo(null),
+
   }
 }
