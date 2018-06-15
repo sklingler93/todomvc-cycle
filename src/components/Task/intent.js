@@ -1,40 +1,41 @@
 import xs from 'xstream';
 import {ENTER_KEY, ESC_KEY} from '../../utils';
 
-// THE TODO ITEM INTENT
-// This intent function returns a stream of all the different,
-// actions that can be taken on a todo.
-function intent(sources) {
-  // THE INTENT MERGE
-  // Merge all actions into one stream.
-  return xs.merge(
-    // THE DESTROY ACTION STREAM
-    sources.DOM.select('.destroy').events('click')
-      .mapTo({type: 'destroy'}),
+export default function intent(domSource) {
+  const editEnterEvent$ = domSource
+    .select('.edit').events('keyup')
+    .filter(ev => ev.keyCode === ENTER_KEY);
 
-    // THE TOGGLE ACTION STREAM
-    sources.DOM.select('.toggle').events('change')
-      .map(ev => ev.target.checked)
-      .map(payload => ({type: 'toggle', payload})),
-    sources.action$
-      .filter(action => action.type === 'toggleAll')
-      .map(action => ({...action, type: 'toggle'})),
+  const editBlurEvent$ = domSource.select('.edit').events('blur', true);
 
-    // THE START EDIT ACTION STREAM
-    sources.DOM.select('label').events('dblclick')
-      .mapTo({type: 'startEdit'}),
+  return {
+    startEdit$: domSource
+      .select('label').events('dblclick')
+      .mapTo(null),
 
-    // THE ESC KEY ACTION STREAM
-    sources.DOM.select('.edit').events('keyup')
+    doneEdit$: xs.merge(editEnterEvent$, editBlurEvent$)
+      .map(ev => ev.target.value),
+
+    cancelEdit$: domSource
+      .select('.edit').events('keyup')
       .filter(ev => ev.keyCode === ESC_KEY)
-      .mapTo({type: 'cancelEdit'}),
+      .mapTo(null),
 
-    // THE ENTER KEY ACTION STREAM
-    sources.DOM.select('.edit').events('keyup')
-      .filter(ev => ev.keyCode === ENTER_KEY)
-      .compose(s => xs.merge(s, sources.DOM.select('.edit').events('blur', true)))
-      .map(ev => ({title: ev.target.value, type: 'doneEdit'}))
-  );
+    toggle$: domSource
+      .select('.toggle').events('change')
+      .map(ev => ev.target.checked),
+
+    destroy$: domSource
+      .select('.destroy').events('click')
+      .mapTo(null),
+
+    hover$: domSource
+      .select('.todo-root').events('mouseover')
+      .mapTo(null),
+
+    unhover$: domSource
+      .select('.todo-root').events('mouseleave')
+      .mapTo(null),
+
+  }
 }
-
-export default intent;

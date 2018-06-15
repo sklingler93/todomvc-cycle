@@ -1,60 +1,48 @@
 import xs from 'xstream';
 
-function makeReducer$(action$) {
-  let startEditReducer$ = action$
-    .filter(action => action.type === 'startEdit')
+export default function model(actions) {
+  const startEditReducer$ = actions.startEdit$
     .mapTo(function startEditReducer(data) {
-      return {
-        ...data,
-        editing: true
-      };
+      return {...data, editing: true};
     });
 
-  let doneEditReducer$ = action$
-    .filter(action => action.type === 'doneEdit')
-    .map(action => function doneEditReducer(data) {
-      return {
-        ...data,
-        title: action.payload,
-        editing: false
-      };
+  const doneEditReducer$ = actions.doneEdit$
+    .map(content => function doneEditReducer(data) {
+      return {...data, title: content, editing: false};
     });
 
-  let cancelEditReducer$ = action$
-    .filter(action => action.type === 'cancelEdit')
+  const cancelEditReducer$ = actions.cancelEdit$
     .mapTo(function cancelEditReducer(data) {
-      return {
-        ...data,
-        editing: false
-      };
+      return {...data, editing: false};
     });
 
-  let toggleReducer$ = action$
-    .filter(action => action.type === 'toggle')
-    .map(action => function toggleReducer(data) {
-      return {
-        ...data,
-        completed: action.payload
-      };
+  const toggleReducer$ = actions.toggle$
+    .map(isToggled => function toggleReducer(data) {
+      return {...data, completed: isToggled};
+    });
+
+  const destroyReducer$ = actions.destroy$
+    .mapTo(function destroyReducer(data) {
+      return void 0;
+    });
+
+  const hoverReducer$ = actions.hover$
+    .mapTo(function hoverReducer(data) {
+      return {...data, hover: true};
+    });
+
+  const unhoverReducer$ = actions.unhover$
+    .mapTo(function unhoverReducer(data) {
+      return {...data, hover: false};
     });
 
   return xs.merge(
     startEditReducer$,
     doneEditReducer$,
     cancelEditReducer$,
-    toggleReducer$
+    toggleReducer$,
+    destroyReducer$,
+    hoverReducer$,
+    unhoverReducer$,
   );
 }
-
-function model(props$, action$) {
-  // THE SANITIZED PROPERTIES
-  // If the list item has no data set it as empty and not completed.
-  let sanitizedProps$ = props$.startWith({title: '', completed: false});
-  let reducer$ = makeReducer$(action$);
-
-  return sanitizedProps$.map(props =>
-    reducer$.fold((data, reducer) => reducer(data), props)
-  ).flatten().remember();
-}
-
-export default model;

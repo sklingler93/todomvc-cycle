@@ -1,85 +1,81 @@
-import {a, button, div, footer, h1, header, input, li,
-        section, span, strong, ul} from '@cycle/dom';
+import xs from 'xstream';
+import {
+  a, button, div, footer, h1, header, input, li, section, span, strong, ul, label
+} from '@cycle/dom';
+import * as globalStyles from '../../styles';
+import * as styles from './styles';
 
-import {todoListStyle, footerStyle} from './styles';
-
-function renderHeader() {
-  return header('.header', [
-    h1('todos'),
+function renderHeader(state) {
+  return header([
+    h1({ css: styles.title() }, 'todos'),
     input('.new-todo', {
       props: {
         type: 'text',
         placeholder: 'What needs to be done?',
         autofocus: true,
-        name: 'newTodo'
+        name: 'newTodo',
+        value: state.inputValue
       },
-      hook: {
-        update: (oldVNode, {elm}) => {
-          elm.value = '';
-        },
-      },
+      css: styles.input(),
     })
   ]);
 }
 
-function renderMainSection(todosData) {
-  let allCompleted = todosData.list.reduce((x, y) => x && y.completed, true);
-  let sectionStyle = {'display': todosData.list.length ? '' : 'none'};
+function renderMainSection(state, listVDom) {
+  const allCompleted = state.list.reduce((x, y) => x && y.completed, true);
 
-  return section('.main', {style: sectionStyle}, [
-    input('.toggle-all', {
-      props: {type: 'checkbox', checked: allCompleted},
+  return section('.main', { css: styles.main(state.list.length) }, [
+    input('#toggle-all.toggle-all', {
+      props: { type: 'checkbox', checked: allCompleted },
+      css: styles.toggleAll(),
     }),
-    ul('.todo-list', {css: todoListStyle()}, todosData.list
-      .filter(todosData.filterFn)
-      .map(data => data.todoItem.DOM)
-    )
+    label('.label', {
+      attrs: { for: 'toggle-all' },
+      css: styles.toggleAllLabel(allCompleted),
+    }, 'Mark all as complete'),
+    listVDom
   ]);
 }
 
-function renderFilterButton(todosData, filterTag, path, label) {
-  return li([
+function renderFilterButton(state, filterTag, path, label) {
+  const selected = state.filter === filterTag;
+  return li({ css: styles.filtersLi() }, [
     a({
-      props: {href: path},
-      class: {selected: todosData.filter === filterTag}
+      attrs: { href: path },
+      css: styles.filtersA(selected)
     }, label)
   ]);
 }
 
-function renderFooter(todosData) {
-  let amountCompleted = todosData.list
-    .filter(todoData => todoData.completed)
+function renderFooter(state) {
+  const amountCompleted = state.list
+    .filter(task => task.completed)
     .length;
-  let amountActive = todosData.list.length - amountCompleted;
+  const amountActive = state.list.length - amountCompleted;
 
-  return footer('.footer', {css: footerStyle(todosData.list.length)}, [
-    span('.todo-count', [
-      strong(String(amountActive)),
+  return footer('.footer', { css: styles.footer(state.list.length) }, [
+    span('.todo-count', { css: styles.todoCount() }, [
+      strong({ css: globalStyles.strong() }, String(amountActive)),
       ' item' + (amountActive !== 1 ? 's' : '') + ' left'
     ]),
-    ul('.filters', [
-      renderFilterButton(todosData, '', '/', 'All'),
-      renderFilterButton(todosData, 'active', '/active', 'Active'),
-      renderFilterButton(todosData, 'completed', '/completed', 'Completed'),
+    ul('.filters', { css: styles.filters() }, [
+      renderFilterButton(state, '', '/', 'All'),
+      renderFilterButton(state, 'active', '/active', 'Active'),
+      renderFilterButton(state, 'completed', '/completed', 'Completed'),
     ]),
     (amountCompleted > 0 ?
-      button('.clear-completed', 'Clear completed (' + amountCompleted + ')')
+      button('.clear-completed', { css: styles.clearCompleted() }, 'Clear completed (' + amountCompleted + ')')
       : null
     )
   ]);
 }
 
-// THE VIEW
-// This function expects the stream of todosData
-// from the model function and turns it into a
-// virtual DOM stream that is then ultimately returned into
-// the DOM sink in the index.js.
-export default function view(todos$) {
-  return todos$.map(todos =>
+export default function view(state$, listVDom$) {
+  return xs.combine(state$, listVDom$).map(([state, listVDom]) =>
     div([
-      renderHeader(),
-      renderMainSection(todos),
-      renderFooter(todos)
+      renderHeader(state),
+      renderMainSection(state, listVDom),
+      renderFooter(state)
     ])
   );
 };

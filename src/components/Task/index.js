@@ -2,19 +2,13 @@ import intent from './intent';
 import model from './model';
 import view from './view';
 
-// THE TODO ITEM FUNCTION
-// This is a simple todo item component,
-// structured with the MVI-pattern.
-function Task(sources) {
-  let action$ = intent(sources);
-  let state$ = model(sources.props$, action$);
-  let vtree$ = view(state$);
+export default function Task(sources) {
+  const actions = intent(sources.DOM);
+  const reducer$ = model(actions);
+  const vdom$ = view(sources.onion.state$);
 
   return {
-    DOM: vtree$,
-    action$,
-    state$
+    DOM: vdom$,
+    onion: reducer$,
   };
 }
-
-export default Task;
